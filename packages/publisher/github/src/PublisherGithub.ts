@@ -101,8 +101,16 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
             uploaded += 1;
             updateUploadStatus();
           };
-          const artifactName = path.basename(artifactPath);
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // Based on https://developer.github.com/v3/repos/releases/#upload-a-release-asset and
+          // https://stackoverflow.com/questions/59081778/rules-for-special-characters-in-github-repository-name
+          const artifactName = path
+            .basename(artifactPath)
+            .replace(/\s/g, '.')
+            .replace(/\.+/g, '.')
+            .replace(/^\./g, '')
+            .replace(/\.$/g, '')
+            .replace(/[^\w.-]/g, '-');
+          // eslint-disable-next-line max-len
           if (release!.assets.find((asset: OctokitReleaseAsset) => asset.name === artifactName)) {
             return done();
           }
@@ -119,7 +127,7 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
               'content-type': mime.lookup(artifactPath) || 'application/octet-stream',
               'content-length': (await fs.stat(artifactPath)).size,
             },
-            name: path.basename(artifactPath),
+            name: artifactName,
           });
           return done();
         })
