@@ -111,9 +111,19 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
             .replace(/\.$/g, '')
             .replace(/[^\w.-]/g, '-');
           // eslint-disable-next-line max-len
-          if (release!.assets.find((asset: OctokitReleaseAsset) => asset.name === artifactName)) {
-            return done();
+          const asset = release!.assets.find((asset: OctokitReleaseAsset) => item.name === artifactName);
+          if (asset !== undefined) {
+            if (config.override === true) {
+              await github.getGitHub().repos.deleteReleaseAsset({
+                owner: config.repository.owner,
+                repo: config.repository.name,
+                asset_id: asset.id,
+              });
+            } else {
+              return done();
+            }
           }
+
           await github.getGitHub().repos.uploadReleaseAsset({
             owner: config.repository.owner,
             repo: config.repository.name,
