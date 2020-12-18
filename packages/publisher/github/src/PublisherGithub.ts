@@ -5,6 +5,11 @@ import { ForgeMakeResult } from '@electron-forge/shared-types';
 import { GetResponseDataTypeFromEndpointMethod } from '@octokit/types';
 import fs from 'fs-extra';
 import mime from 'mime-types';
+<<<<<<< HEAD
+=======
+import PublisherBase, { PublisherOptions } from '@electron-forge/publisher-base';
+import { GetResponseDataTypeFromEndpointMethod } from '@octokit/types';
+>>>>>>> e15c36217 (feat(publisher-github): add tests for asset name sanitization)
 
 import { PublisherGitHubConfig } from './Config';
 import GitHub from './util/github';
@@ -101,6 +106,7 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
             uploaded += 1;
             updateUploadStatus();
           };
+<<<<<<< HEAD
           // Based on https://developer.github.com/v3/repos/releases/#upload-a-release-asset and
           // https://stackoverflow.com/questions/59081778/rules-for-special-characters-in-github-repository-name
           const artifactName = path
@@ -110,6 +116,9 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
             .replace(/^\./g, '')
             .replace(/\.$/g, '')
             .replace(/[^\w.-]/g, '-');
+=======
+          const artifactName = GitHub.sanitizeName(artifactPath);
+>>>>>>> e15c36217 (feat(publisher-github): add tests for asset name sanitization)
           // eslint-disable-next-line max-len
           const asset = release!.assets.find((item: OctokitReleaseAsset) => item.name === artifactName);
           if (asset !== undefined) {
