@@ -101,10 +101,15 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
             uploaded += 1;
             updateUploadStatus();
           };
+
+          if (!release) {
+            throw new NoReleaseError(404);
+          }
+
           const artifactName = path.basename(artifactPath);
-          const asset = release!.assets.find((item: OctokitReleaseAsset) => item.name === artifactName);
+          const asset = release.assets.find((item: OctokitReleaseAsset) => item.name === artifactName);
           if (asset !== undefined) {
-            if (config.override === true) {
+            if (config.force === true) {
               await github.getGitHub().repos.deleteReleaseAsset({
                 owner: config.repository.owner,
                 repo: config.repository.name,
@@ -118,10 +123,8 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
           await github.getGitHub().repos.uploadReleaseAsset({
             owner: config.repository.owner,
             repo: config.repository.name,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            release_id: release!.id,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            url: release!.upload_url,
+            release_id: release.id,
+            url: release.upload_url,
             // https://github.com/octokit/rest.js/issues/1645
             data: (await fs.readFile(artifactPath)) as unknown as string,
             headers: {
