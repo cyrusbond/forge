@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { PublisherBase, PublisherOptions } from '@electron-forge/publisher-base';
 import { ForgeMakeResult } from '@electron-forge/shared-types';
 import { GetResponseDataTypeFromEndpointMethod } from '@octokit/types';
@@ -101,12 +99,10 @@ export default class PublisherGithub extends PublisherBase<PublisherGitHubConfig
             uploaded += 1;
             updateUploadStatus();
           };
-
           if (!release) {
             throw new NoReleaseError(404);
           }
-
-          const artifactName = path.basename(artifactPath);
+          const artifactName = GitHub.sanitizeName(artifactPath);
           const asset = release.assets.find((item: OctokitReleaseAsset) => item.name === artifactName);
           if (asset !== undefined) {
             if (config.force === true) {
